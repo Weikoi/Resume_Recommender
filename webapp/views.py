@@ -15,6 +15,7 @@ def analysis(request):
     import os
     import re
     jieba.load_userdict(r"./corpus/jieba.txt")
+    jd_dict = {}
 
     def get_pair_by_jieba(str_demo):
         """
@@ -58,7 +59,86 @@ def analysis(request):
                     # print(word.word, word.flag)
         return return_list
 
-    print(request)
+    def transfer_pair(list_demo):
+        """
+
+        :param list_demo: 接受技能描述对
+        :return: return_dict 返回一个字典，字典的key为技能实体，匹配图数据库中的节点，value为对于技能的掌握要求
+        """
+        return_list = []
+        for i in list_demo:
+            level = 1
+            if re.search(r"(了解|会使用|一般|能够|使用过)", i[0]):
+                level = 1
+            elif re.search(r"(经验|掌握|熟悉|良好|熟练)", i[0]):
+                level = 2
+            elif re.search(r"(精通|擅长|扎实|深刻)", i[0]):
+                level = 3
+
+            if re.search(r"(spring mvc)", i[1]):
+                return_list.append([level, "springmvc"])
+            elif re.search(r"(springboot|spring boot)", i[1]):
+                return_list.append([level, "springmvc"])
+            elif re.search(r"(springcloud|spring cloud)", i[1]):
+                return_list.append([level, "springcloud"])
+            elif re.search(r"(数据结构)", i[1]):
+                return_list.append([level, "ds&algorithms"])
+            elif re.search(r"(软工|软件工程|uml)", i[1]):
+                return_list.append([level, "ds&algorithms"])
+            elif re.search(r"(jsp|js|java script|javascript)", i[1]):
+                return_list.append([level, "javascript"])
+            elif re.search(r"(ts|type script|typescript)", i[1]):
+                return_list.append([level, "typescript"])
+            elif re.search(r"(vue)", i[1]):
+                return_list.append([level, "vue"])
+            elif re.search(r"(react)", i[1]):
+                return_list.append([level, "react"])
+            elif re.search(r"(angular)", i[1]):
+                return_list.append([level, "angular"])
+            elif re.search(r"(electron)", i[1]):
+                return_list.append([level, "electron"])
+            elif re.search(r"(node)", i[1]):
+                return_list.append([level, "node"])
+            elif re.search(r"(rabbit mq)", i[1]):
+                return_list.append([level, "rabbitmq"])
+            elif re.search(r"(rocket mq)", i[1]):
+                return_list.append([level, "rocketmq"])
+            elif re.search(r"(active mq)", i[1]):
+                return_list.append([level, "activemq"])
+            elif re.search(r"(k8s)", i[1]):
+                return_list.append([level, "kubernetes"])
+            elif re.search(r"(微服务)", i[1]):
+                return_list.append([level, "container"])
+            elif re.search(r"(大数据)", i[1]):
+                return_list.append([level, "big_data"])
+            elif re.search(r"(github)", i[1]):
+                return_list.append([level, "git"])
+            elif re.search(r"(sessions)", i[1]):
+                return_list.append([level, "session"])
+            elif re.search(r"(cookies)", i[1]):
+                return_list.append([level, "cookie"])
+            elif re.search(r"(证券公司)", i[1]):
+                return_list.append([level, "券商"])
+            elif re.search(r"(ssh)", i[1]):
+                return_list.append([level, "spring"])
+                return_list.append([level, "struts"])
+                return_list.append([level, "hibernate"])
+            elif re.search(r"(ssm)", i[1]):
+                return_list.append([level, "spring"])
+                return_list.append([level, "springmvc"])
+                return_list.append([level, "mybatis"])
+            else:
+                return_list.append([level, i[1]])
+        return_dict = {}
+        for pair in return_list:
+            if pair[1] not in return_dict:
+                return_dict[pair[1]] = pair[0]
+            else:
+                if pair[0] > return_dict[pair[1]]:
+                    return_dict[pair[1]] = pair[0]
+        return return_dict
+
+
     print(request.POST.get("job_name"))
     print(request.POST.get("job_exp"))
     print(request.POST.get("edu_degree"))
@@ -66,7 +146,7 @@ def analysis(request):
     print(request.POST.get("com_cate"))
     print(request.POST.get("job_duty"))
     print(request.POST.get("job_demand"))
-    print(get_pair_by_jieba(request.POST.get("job_demand")))
+    print(transfer_pair(get_pair_by_jieba(request.POST.get("job_demand"))))
     # name = request.POST.get('name')
     # print(name)
-    return render(request, 'index.html')
+    return render(request, 'analysis.html')
