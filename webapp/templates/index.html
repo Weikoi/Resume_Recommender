@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+
+{% block title %} 欢迎来到简历匹配系统！ {% endblock %}
+
+
+{% block content %}
+
+    <div class="container myContainer">
+        <form action="analysis/" method="post">
+            {% csrf_token %}
+            <div class="row col-lg-7 col-lg-offset-3">
+                        <div class="form-group">
+                            <label for="exampleInputEmail1">岗位名称: </label>
+                            <input name="job_name" type="text" class="form-control" id="exampleInputEmail1" placeholder="job name">
+                        </div>
+                        <div class="form-group">
+                            <label for="exampleInputPassword1">工作经验: </label>
+                            <input name="job_exp" type="text" class="form-control" id="exampleInputPassword1" placeholder="experience">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="exampleInputPassword1">学历要求: </label>
+                            <select name="edu_degree" class="form-control">
+                              <option>不限</option>
+                              <option>大专</option>
+                              <option>本科</option>
+                              <option>硕士</option>
+                              <option>博士</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="exampleInputPassword1">公司规模: </label>
+                            <select name="com_scale" class="form-control">
+                              <option>1-49人</option>
+                              <option>50-99人</option>
+                              <option>100-499人</option>
+                              <option>500-999人</option>
+                              <option>1000-2000人</option>
+                              <option>2000-5000人</option>
+                              <option>5000-10000人</option>
+                              <option>10000人以上</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="exampleInputPassword1">行业类别: </label>
+                            <select name="com_cate" class="form-control">
+                              <option>计算机|互联网|数据|信息|IT</option>
+                              <option>游戏|文娱</option>
+                              <option>电子|硬件|通信</option>
+                              <option>金融|证券|银行|保险|投行</option>
+                              <option>其它</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="exampleInputPassword1">职位描述: </label>
+                            <textarea name="job_duty" class="form-control" rows="5"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="exampleInputPassword1">岗位要求: </label>
+                            <textarea name="job_demand" class="form-control" rows="5"></textarea>
+                        </div>
+                        <div style="text-align:center"><button type="submit" class="btn btn-primary btn-lg active">简历推荐</button></div>
+                        {#                        <button class="btn btn-default btn-lg btn-info" style="alignment: center" type="submit">推荐简历</button>#}
+            </div>
+        </form>
+    </div>
+
+{% endblock %}
