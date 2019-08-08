@@ -8,8 +8,8 @@
     <div class="text-center" style="height: 100px">
         <h1>JD 分析</h1>
     </div>
-    <div id="main" class="col-md-offset-3 myContainer" style="width: 800px;height:400px;"></div>
-    <div id="second" class="col-md-offset-3 myContainer" style="width: 800px;height:400px;"></div>
+    <div id="main" class="col-md-offset-3 myContainer" style="margin:0 auto;width: 800px;height:400px;"></div>
+    <div id="second" class="col-md-offset-3 myContainer" style="margin:0 auto;width: 800px;height:400px;"></div>
     <script src="../static/jquery-3.1.1.min.js"></script>
     <script src="https://cdn.bootcss.com/echarts/3.2.2/echarts.simple.js"></script>
     <script src="../static/echarts.min.js"></script>
@@ -131,11 +131,7 @@
         chart.setOption(option);
         {#bookChart.setOption(bookOption);#}
     </script>
-    <div style="text-align:center; border-bottom-width: 100px;"><a href="/result/" type="submit" class="btn btn-primary btn-lg active">简历推荐</a></div>
-    <br>
-    <br>
-    <br>
-    <br>
-    <br>
+    <div style="text-align:center;margin-bottom: 200px;margin-top: 50px;"><a href="/result/" type="submit" class="btn btn-primary btn-lg active">简历推荐</a></div>
+
 
 {% endblock %}
