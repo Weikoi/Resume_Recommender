@@ -11,6 +11,7 @@ def index(request):
 def analysis(request):
     import jieba.posseg as pseg
     import jieba
+    import json
     import sys
     import os
     import re
@@ -138,15 +139,25 @@ def analysis(request):
                     return_dict[pair[1]] = pair[0]
         return return_dict
 
+    jd_dict["job_name"] = request.POST.get("job_name")
+    jd_dict["job_exp"] = request.POST.get("job_exp")
+    jd_dict["edu_degree"] = request.POST.get("edu_degree")
+    jd_dict["com_scale"] = request.POST.get("com_scale")
+    jd_dict["com_cate"] = request.POST.get("com_cate")
+    jd_dict["job_duty"] = request.POST.get("job_duty")
+    jd_dict["job_demand"] = request.POST.get("job_demand")
+    jd_dict["skill_pair"] = transfer_pair(get_pair_by_jieba(request.POST.get("job_demand")))
+    response = render(request, 'analysis.html', {'jd_dict': jd_dict})
+    jd_dict_json = json.dumps(jd_dict)
+    response.set_cookie('jd_dict_json', jd_dict_json)
+    return response
 
-    print(request.POST.get("job_name"))
-    print(request.POST.get("job_exp"))
-    print(request.POST.get("edu_degree"))
-    print(request.POST.get("com_scale"))
-    print(request.POST.get("com_cate"))
-    print(request.POST.get("job_duty"))
-    print(request.POST.get("job_demand"))
-    print(transfer_pair(get_pair_by_jieba(request.POST.get("job_demand"))))
-    # name = request.POST.get('name')
-    # print(name)
-    return render(request, 'analysis.html')
+
+def result(request):
+    response = render(request, 'result.html')
+    return response
+
+
+def about(request):
+    response = render(request, 'about.html')
+    return response
