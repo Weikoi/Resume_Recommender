@@ -10,8 +10,10 @@
     </div>
     <div id="main" class="col-md-offset-3 myContainer" style="width: 800px;height:400px;"></div>
     <div id="second" class="col-md-offset-3 myContainer" style="width: 800px;height:400px;"></div>
+    <script src="../static/jquery-3.1.1.min.js"></script>
+    <script src="https://cdn.bootcss.com/echarts/3.2.2/echarts.simple.js"></script>
     <script src="../static/echarts.min.js"></script>
-    <script src="../static/echarts-wordcloud.min.js"></script>
+    <script src="https://ecomfe.github.io/echarts-wordcloud/dist/echarts-wordcloud.js"></script>
     <script type="text/javascript">
         // 基于准备好的dom，初始化echarts实例
         var radar_chart = echarts.init(document.getElementById('main'));
@@ -60,10 +62,10 @@
             series: [{
                 type: "wordCloud",
                 gridSize: 6,
-                shape: 'diamond',
-                sizeRange: [12, 50],
+                shape: 'circle',
+                sizeRange: [40, 100],
                 width: 800,
-                height: 500,
+                height: 400,
                 textStyle: {
                     normal: {
                         color: function () {
@@ -80,20 +82,44 @@
                     }
                 },
                 data: [{
-                    name: " 没有",
-                    value: 3,
-                },
-                    {
-                        name: " 屏幕",
-                        value: 24
+                        name: " Redis",
+                        value: 2,
                     },
                     {
-                        name: " 不错",
-                        value: 21
+                        name: " Java",
+                        value: 2
                     },
                     {
-                        name: " 可以",
-                        value: 19
+                        name: "Spring",
+                        value: 2
+                    },
+                    {
+                        name: "架构",
+                        value: 2
+                    },
+                    {
+                        name: "多线程",
+                        value: 2
+                    },
+                    {
+                        name: "高并发",
+                        value: 2
+                    },
+                    {
+                        name: "金融",
+                        value: 2
+                    },
+                    {
+                        name: "mysql",
+                        value: 2
+                    },
+                    {
+                        name: "oracle",
+                        value: 2
+                    },
+                    {
+                        name: "hibernetes",
+                        value: 2
                     },
 
                 ],
@@ -105,7 +131,7 @@
         chart.setOption(option);
         {#bookChart.setOption(bookOption);#}
     </script>
-    <div style="text-align:center"><a href="/result/" type="submit" class="btn btn-primary btn-lg active">简历推荐</a></div>
+    <div style="text-align:center; border-bottom-width: 100px;"><a href="/result/" type="submit" class="btn btn-primary btn-lg active">简历推荐</a></div>
     <br>
     <br>
     <br>

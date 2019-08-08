@@ -423,19 +423,19 @@ def result(request):
     """
     此循环是实时计算使用的
     """
-    for i in range(cv_length):
-        print("%d====of===1000" % i)
-        cv = cv_data[i]
-
-        for key in selected_jd_features:
-            sample_data[key] = new_dict[key]
-        for key in selected_cv_features:
-            sample_data[key] = cv[key]
-        sample_data["skill_sim"] = cal_similarity(new_dict, cv)
-        sample_data["sample_id"] = i
-        sample_list.append(sample_data)
-    pk.dump(sample_list, file=open("./data/sample_1000.bin", "wb"))
-    # sample_list = pk.load(file=open("./data/sample_1000.bin", "rb"))
+    # for i in range(cv_length):
+    #     print("%d====of===1000" % i)
+    #     cv = cv_data[i]
+    #
+    #     for key in selected_jd_features:
+    #         sample_data[key] = new_dict[key]
+    #     for key in selected_cv_features:
+    #         sample_data[key] = cv[key]
+    #     sample_data["skill_sim"] = cal_similarity(new_dict, cv)
+    #     sample_data["sample_id"] = i
+    #     sample_list.append(sample_data)
+    # pk.dump(sample_list, file=open("./data/sample_1000.bin", "wb"))
+    sample_list = pk.load(file=open("./data/sample_1000.bin", "rb"))
 
     """
     构造特征
@@ -482,7 +482,7 @@ def result(request):
         # print(pretty_dict(i))
         new_sample_list.append(i)
 
-    print(len(sample_list.keys()))
+    print(len(sample_list[0].keys()))
     response = render(request, 'result.html')
     return response
 
