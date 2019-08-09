@@ -1,14 +1,21 @@
 from django.shortcuts import render
-
+from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage, InvalidPage
+from django.http import HttpResponse
 # Create your views here.
 import jieba.posseg as pseg
 import jieba
-import json
 import sys
 import os
+import pickle as pk
 import re
+import json
+import numpy as np
+import pandas as pd
+from keras.models import load_model
 
 jieba.load_userdict(r"./corpus/jieba.txt")
+network = load_model('./dnn_model.h5')
+print("network test:", network.predict(np.zeros((1, 53))))
 
 
 def get_pair_by_jieba(str_demo):
@@ -139,6 +146,7 @@ def index(request):
 
 
 def analysis(request):
+
     import jieba.posseg as pseg
     import jieba
     import json
@@ -164,9 +172,7 @@ def analysis(request):
 
 
 def result(request):
-    import pickle as pk
-    import re
-    import json
+
 
     jd_dict_json = request.COOKIES['jd_dict_json']
     jd_dict = json.loads(jd_dict_json)
@@ -386,10 +392,9 @@ def result(request):
     jd_features = ['is_valid', 'jd_id', 'salary_low', 'salary_mid', 'salary_high', 'com_cat', 'com_scale',
                    'edu_degree',
                    'edu_major', 'job_exp', 'job_demand', 'job_duty', 'job_name', 'job_level', 'skill_pair']
-    selected_jd_features = ['jd_id', 'salary_low', 'salary_mid', 'salary_high', 'com_cat', 'com_scale',
+    selected_jd_features = ['salary_low', 'salary_mid', 'salary_high', 'com_cat', 'com_scale',
                             'edu_degree',
                             'edu_major', 'job_exp', 'job_level']
-    sample_data = {}
 
     cv_features = ['cv_id', 'age', 'gender', 'work_experience', 'degree', 'english', 'edu_gz_is', 'edu_dz_is',
                    'edu_dz_major', 'edu_bachelor_is', 'edu_bachelor_major', 'edu_bachelor_985',
@@ -405,7 +410,7 @@ def result(request):
                    'work_domain3', 'work_exp3', 'skill_tree', 'project_exp', 'intention_cur_status',
                    'intention_job',
                    'intention_cur_salary', 'skill_pair']
-    selected_cv_features = ['cv_id', 'age', 'gender', 'work_experience', 'degree', 'english', 'edu_gz_is',
+    selected_cv_features = ['age', 'gender', 'work_experience', 'degree', 'english', 'edu_gz_is',
                             'edu_dz_is',
                             'edu_dz_major', 'edu_bachelor_is', 'edu_bachelor_major', 'edu_bachelor_985',
                             'edu_bachelor_211',
@@ -420,11 +425,18 @@ def result(request):
                             'work_exp_long', 'work_exp_short', 'work_domain1', 'work_exp1', 'work_domain2',
                             'work_exp2',
                             'work_domain3', 'work_exp3', 'intention_cur_status', 'intention_cur_salary']
+    label_features = ["skill_sim", "label"]
+    sim_features = ["skill_sim"]
+
+    all_columns = selected_jd_features + selected_cv_features + label_features
+    columns = selected_jd_features + selected_cv_features + sim_features
+
     """
     此循环是实时计算使用的
     """
     # for i in range(cv_length):
-    #     print("%d====of===1000" % i)
+    #     sample_data = {}
+    #     print("%d====of===10000" % i)
     #     cv = cv_data[i]
     #
     #     for key in selected_jd_features:
@@ -434,17 +446,17 @@ def result(request):
     #     sample_data["skill_sim"] = cal_similarity(new_dict, cv)
     #     sample_data["sample_id"] = i
     #     sample_list.append(sample_data)
-    # pk.dump(sample_list, file=open("./data/sample_1000.bin", "wb"))
+    # pk.dump(sample_list, file=open("./data/sample_10000.bin", "wb"))
     sample_list = pk.load(file=open("./data/sample_1000.bin", "rb"))
 
     """
-    构造特征
+    新特征构造
     """
     import math
     from util.tools import pretty_dict
     new_sample_list = []
     for i in sample_list:
-        print(pretty_dict(i))
+        # print(pretty_dict(i))
         """
         正样本特征构造
         """
@@ -456,7 +468,7 @@ def result(request):
 
         gap_exp = i["work_experience"] - i["job_exp"]
         if gap_exp < 0:
-            i["gap_exp"] = math.log(-gap_exp)
+            i["gap_exp"] = - math.log(-gap_exp)
         if gap_exp > 3:
             i["gap_exp"] = - math.log(gap_exp)
         else:
@@ -482,8 +494,47 @@ def result(request):
         # print(pretty_dict(i))
         new_sample_list.append(i)
 
-    print(len(sample_list[0].keys()))
-    response = render(request, 'result.html')
+    """
+    预测向量构造
+    """
+    df = pd.DataFrame(new_sample_list)
+    print(len(columns))
+    X = df[columns]
+    print(X.describe())
+    X = X.values.reshape((1000, 53 * 1))
+
+    df["predict"] = network.predict(X)
+    df["class"] = df["score"].apply(lambda x: 1 if x > 0.99 else 0)
+
+    result_df = df[df["class"] == 1]
+    print(len(result_df.columns))
+    id_list = result_df.sort_values("score")["cv_id"]
+
+    raw_cv = pk.load(file=open("./data/cv_1000_raw_id.bin","rb"))
+    book_list = [raw_cv[i] for i in id_list]
+
+    """
+    分页器模块
+    """
+    paginator = Paginator(book_list, 10)
+
+    if request.method == "GET":
+        # 获取 url 后面的 page 参数的值, 首页不显示 page 参数, 默认值是 1
+        page = request.GET.get('page')
+        try:
+            books = paginator.page(page)
+        # todo: 注意捕获异常
+        except PageNotAnInteger:
+            # 如果请求的页数不是整数, 返回第一页。
+            books = paginator.page(1)
+        except InvalidPage:
+            # 如果请求的页数不存在, 重定向页面
+            return HttpResponse('找不到页面的内容')
+        except EmptyPage:
+            # 如果请求的页数不在合法的页数范围内，返回结果的最后一页。
+            books = paginator.page(paginator.num_pages)
+
+    response = render(request, 'result.html', {'books': books})
     return response
 
 
