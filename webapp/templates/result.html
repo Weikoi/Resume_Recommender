@@ -3,11 +3,35 @@
 {% block title %}推荐结果{% endblock %}
 
 {% block content %}
-    <div class="text-center" >
-        {% for book in books %}
-            <span>书名： {{ book.age }} <br /></span>
-        {% endfor %}
-    </div>
+
+    <table class="table table-hover" style="margin-left: 50px">
+            <thead>
+            <th>id</th>
+            <th>工作经验</th>
+            <th>性别</th>
+            <th>最高学历</th>
+            <th>技能相似度</th>
+            <th>推荐得分</th>
+            <th>查看详情</th>
+            </thead>
+            <tbody>
+            {% for book in books %}
+                <tr>
+                    <td>{{ book.cv_id }}</td>
+                    <td>{{ book.work_experience }}</td>
+                    <td>{{ book.gender }}</td>
+                    <td>{{ book.degree }}</td>
+                    <td>{{ book.skill_sim }}</td>
+                    <td>{{ book.score }}</td>
+                    <td><a>查看详情</a></td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td>暂无图书</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+    </table>
 
     {# 实现分页标签的代码 #}
     {# 这里使用 bootstrap 渲染页面 #}

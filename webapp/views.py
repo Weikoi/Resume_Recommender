@@ -12,7 +12,15 @@ import json
 import numpy as np
 import pandas as pd
 from keras.models import load_model
+from keras import backend
 
+
+pd.set_option('display.max_rows', 500)
+pd.set_option('display.max_columns', 500)
+pd.set_option('display.width', 1000)
+
+#Before prediction
+backend.clear_session()
 jieba.load_userdict(r"./corpus/jieba.txt")
 network = load_model('./dnn_model.h5')
 print("network test:", network.predict(np.zeros((1, 53))))
@@ -172,8 +180,6 @@ def analysis(request):
 
 
 def result(request):
-
-
     jd_dict_json = request.COOKIES['jd_dict_json']
     jd_dict = json.loads(jd_dict_json)
     new_dict = {}
@@ -500,18 +506,30 @@ def result(request):
     df = pd.DataFrame(new_sample_list)
     print(len(columns))
     X = df[columns]
-    print(X.describe())
+    # print(X.describe())
     X = X.values.reshape((1000, 53 * 1))
 
     df["predict"] = network.predict(X)
-    df["class"] = df["score"].apply(lambda x: 1 if x > 0.99 else 0)
+
+    print(df["predict"])
+
+    df["class"] = df["predict"].apply(lambda x: 1 if x > 0.90 else 0)
 
     result_df = df[df["class"] == 1]
-    print(len(result_df.columns))
-    id_list = result_df.sort_values("score")["cv_id"]
-
+    # print(len(result_df.columns))
+    id_list = result_df.sort_values("score", ascending=False)["cv_id"]
+    print(id_list)
+    result_df.set_index("cv_id")
     raw_cv = pk.load(file=open("./data/cv_1000_raw_id.bin","rb"))
-    book_list = [raw_cv[i] for i in id_list]
+    # book_list = [raw_cv[i] for i in id_list]
+    book_list = []
+
+    for i in id_list:
+        temp_dict = raw_cv[i]
+
+        temp_dict["skill_sim"] = float(df.loc[df['cv_id'] == i]["skill_sim"])
+        temp_dict["score"] = float(df.loc[df['cv_id'] == i]["score"])
+        book_list.append(temp_dict)
 
     """
     分页器模块
