@@ -87,7 +87,7 @@ def transfer_pair(list_demo):
         if re.search(r"(spring mvc)", i[1]):
             return_list.append([level, "springmvc"])
         elif re.search(r"(springboot|spring boot)", i[1]):
-            return_list.append([level, "springmvc"])
+            return_list.append([level, "springboot"])
         elif re.search(r"(springcloud|spring cloud)", i[1]):
             return_list.append([level, "springcloud"])
         elif re.search(r"(数据结构)", i[1]):
@@ -216,7 +216,8 @@ def analysis(request):
     rader_statics = [parse_exp(jd_dict["job_exp"]), parse_edu(jd_dict["edu_degree"]),
                      parse_skill(jd_dict["skill_pair"])]
     word_cloud = [{'name': k, 'value': v} for k, v in jd_dict["skill_pair"].items()]
-    # data_word = [{"name": "spring", "value": "2"}]
+    # word_cloud = [{'name': 'spring', 'value': 2}]
+    print(rader_statics)
     print(word_cloud)
     context = {
         'jd_dict': jd_dict,

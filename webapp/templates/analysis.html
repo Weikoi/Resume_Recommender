@@ -19,8 +19,7 @@
         // 基于准备好的dom，初始化echarts实例
         var radar_chart = echarts.init(document.getElementById('main'));
         var chart = echarts.init(document.getElementById('second'));
-        var data = {{ word_cloud }}
-        console
+        {#console.log(data);#}
 
         radar_option = {
             title: {
@@ -59,6 +58,9 @@
             }]
         };
         option = {
+            title: {
+                text: 'JD 词云图:'
+            },
             tooltip: {
                 show: true
             },
@@ -68,6 +70,7 @@
                 shape: 'circle',
                 sizeRange: [30, 80],
                 width: 800,
+                rotate_step: 0,
                 height: 400,
                 textStyle: {
                     normal: {
@@ -84,7 +87,7 @@
                         shadowColor: '#333'
                     }
                 },
-                data: data,
+                data: {{ word_cloud|safe }},
             }]
         };
 
