@@ -13,11 +13,14 @@
     <script src="../static/jquery-3.1.1.min.js"></script>
     <script src="https://cdn.bootcss.com/echarts/3.2.2/echarts.simple.js"></script>
     <script src="../static/echarts.min.js"></script>
-    <script src="https://ecomfe.github.io/echarts-wordcloud/dist/echarts-wordcloud.js"></script>
+    <script src="../static/echarts-wordcloud.js"></script>
+{#    <script src="https://ecomfe.github.io/echarts-wordcloud/dist/echarts-wordcloud.js"></script>#}
     <script type="text/javascript">
         // 基于准备好的dom，初始化echarts实例
         var radar_chart = echarts.init(document.getElementById('main'));
         var chart = echarts.init(document.getElementById('second'));
+        var data = {{ word_cloud }}
+        console
 
         radar_option = {
             title: {
@@ -49,7 +52,7 @@
                 // areaStyle: {normal: {}},
                 data: [
                     {
-                        value: [3, 2, 3],
+                        value: {{ rader_statics }},
                         name: 'jd要求'
                     },
                 ]
@@ -63,7 +66,7 @@
                 type: "wordCloud",
                 gridSize: 6,
                 shape: 'circle',
-                sizeRange: [40, 100],
+                sizeRange: [30, 80],
                 width: 800,
                 height: 400,
                 textStyle: {
@@ -81,48 +84,7 @@
                         shadowColor: '#333'
                     }
                 },
-                data: [{
-                        name: " Redis",
-                        value: 2,
-                    },
-                    {
-                        name: " Java",
-                        value: 2
-                    },
-                    {
-                        name: "Spring",
-                        value: 2
-                    },
-                    {
-                        name: "架构",
-                        value: 2
-                    },
-                    {
-                        name: "多线程",
-                        value: 2
-                    },
-                    {
-                        name: "高并发",
-                        value: 2
-                    },
-                    {
-                        name: "金融",
-                        value: 2
-                    },
-                    {
-                        name: "mysql",
-                        value: 2
-                    },
-                    {
-                        name: "oracle",
-                        value: 2
-                    },
-                    {
-                        name: "hibernetes",
-                        value: 2
-                    },
-
-                ],
+                data: data,
             }]
         };
 

@@ -1,64 +1,176 @@
-{% extends 'library/base.html' %}
+{% extends 'base.html' %}
 {% load staticfiles %}
 
-{% block title %} 统计信息 {% endblock %}
+{% block title %} 简历数据统计信息 {% endblock %}
 
 {% block content %}
 
-    <div class="text-center">
+    <div class="text-center" style="margin-bottom: 70px">
         <h1>统计信息</h1>
     </div>
-    <div id="reader-rank" class="col-md-offset-3" style="width: 1000px;height:400px;"></div>
-    <div id="book-rank" class="col-md-offset-3 myContainer" style="width: 1000px;height:400px;"></div>
+    <div id="main" class="col-md-offset-3 myContainer" style="margin:50px auto;width: 600px;height:400px;"></div>
+    <div id="second" class="col-md-offset-3 myContainer" style="margin:50px auto;width: 600px;height:400px;"></div>
+    <div id="third" class="col-md-offset-3 myContainer" style="margin:50px auto;width: 600px;height:400px;"></div>
+    <div id="fourth" class="col-md-offset-3 myContainer" style="margin:50px auto;width: 600px;height:400px;"></div>
+    <script src="../static/echarts.min.js"></script>
     <script type="text/javascript">
         // 基于准备好的dom，初始化echarts实例
-        var readerChart = echarts.init(document.getElementById('reader-rank'));
-        var bookChart = echarts.init(document.getElementById('book-rank'));
+        var chart1 = echarts.init(document.getElementById('main'));
+        var chart2 = echarts.init(document.getElementById('second'));
+        var chart3 = echarts.init(document.getElementById('third'));
+        var chart4 = echarts.init(document.getElementById('fourth'));
 
         // 指定图表的配置项和数据
-        var readerOption = {
-            title: {
-                text: '借书排行榜'
+        option1 = {
+            title : {
+                text: '性别比例',
+                x:'center'
             },
-            tooltip: {},
+            tooltip : {
+                trigger: 'item',
+                formatter: "{a} <br/>{b} : {c} ({d}%)"
+            },
             legend: {
-                data: ['借书量']
+                orient: 'vertical',
+                left: 'left',
+                data: ['男','女']
             },
-            xAxis: {
-                data: [ {% for x in readerData %} '{{ x }}', {% endfor %} ]
-
+            series : [
+                {
+                    name: '性别比例',
+                    type: 'pie',
+                    radius : '55%',
+                    center: ['50%', '60%'],
+                    data:[
+                        {value:{{ gender_stat.0 }}, name:'男'},
+                        {value:{{ gender_stat.1 }}, name:'女'},
+                    ],
+                    itemStyle: {
+                        emphasis: {
+                            shadowBlur: 10,
+                            shadowOffsetX: 0,
+                            shadowColor: 'rgba(0, 0, 0, 0.5)'
+                        }
+                    }
+                }
+            ]
+        };
+        option2 = {
+            title : {
+                text: '学历比例',
+                x:'center'
             },
-            yAxis: {},
-            series: [{
-                name: '借书量',
-                type: 'bar',
-                data: [ {% for x in readerAmountData %} '{{ x }}', {% endfor %} ]
-
-            }]
+            tooltip : {
+                trigger: 'item',
+                formatter: "{a} <br/>{b} : {c} ({d}%)"
+            },
+            legend: {
+                orient: 'vertical',
+                left: 'left',
+                data: ['其它','专科','本科','硕士','博士']
+            },
+            series : [
+                {
+                    name: '学历比例',
+                    type: 'pie',
+                    radius : '55%',
+                    center: ['50%', '60%'],
+                    data:[
+                        {value:{{ degree_stat.0 }}, name:'其它'},
+                        {value:{{ degree_stat.1 }}, name:'专科'},
+                        {value:{{ degree_stat.2 }}, name:'本科'},
+                        {value:{{ degree_stat.3 }}, name:'硕士'},
+                        {value:{{ degree_stat.4 }}, name:'博士'},
+                    ],
+                    itemStyle: {
+                        emphasis: {
+                            shadowBlur: 10,
+                            shadowOffsetX: 0,
+                            shadowColor: 'rgba(0, 0, 0, 0.5)'
+                        }
+                    }
+                }
+            ]
+        };
+        option3 = {
+            title : {
+                text: '工作经验分布比例',
+                x:'center'
+            },
+            tooltip : {
+                trigger: 'item',
+                formatter: "{a} <br/>{b} : {c} ({d}%)"
+            },
+            legend: {
+                orient: 'vertical',
+                left: 'left',
+                data: ['0','1-2','3-5','6-10','大于10']
+            },
+            series : [
+                {
+                    name: '工作经验分布比例',
+                    type: 'pie',
+                    radius : '55%',
+                    center: ['50%', '60%'],
+                    data:[
+                        {value:{{ exp_stat.0 }}, name:'0'},
+                        {value:{{ exp_stat.1 }}, name:'1-2'},
+                        {value:{{ exp_stat.2 }}, name:'3-5'},
+                        {value:{{ exp_stat.3 }}, name:'6-10'},
+                        {value:{{ exp_stat.4 }}, name:'大于10'},
+                    ],
+                    itemStyle: {
+                        emphasis: {
+                            shadowBlur: 10,
+                            shadowOffsetX: 0,
+                            shadowColor: 'rgba(0, 0, 0, 0.5)'
+                        }
+                    }
+                }
+            ]
         };
 
-        var bookOption = {
-            title: {
-                text: '最受欢迎的图书'
+        option4 = {
+            title : {
+                text: '知名企业从业经历比例',
+                x:'center'
             },
-            tooltip: {},
+            tooltip : {
+                trigger: 'item',
+                formatter: "{a} <br/>{b} : {c} ({d}%)"
+            },
             legend: {
-                data: ['借书量'],
+                orient: 'vertical',
+                left: 'left',
+                data: ['有','无']
             },
-            xAxis: {
-                data: [ {% for x in bookData %} '《{{ x }}》', {% endfor %} ]
-
-            },
-            yAxis: {},
-            series: [{
-                name: '借书量',
-                type: 'bar',
-                data: [ {% for x in bookAmountData %} '{{ x }}', {% endfor %} ]
-
-            }]
+            series : [
+                {
+                    name: '知名企业从业经历比例',
+                    type: 'pie',
+                    radius : '55%',
+                    center: ['50%', '60%'],
+                    data:[
+                        {value:{{ exp_top.0 }}, name:'有'},
+                        {value:{{ exp_top.1 }}, name:'无'},
+                    ],
+                    itemStyle: {
+                        emphasis: {
+                            shadowBlur: 10,
+                            shadowOffsetX: 0,
+                            shadowColor: 'rgba(0, 0, 0, 0.5)'
+                        }
+                    }
+                }
+            ]
         };
-        readerChart.setOption(readerOption);
-        bookChart.setOption(bookOption);
+
+
+
+        chart1.setOption(option1);
+        chart2.setOption(option2);
+        chart3.setOption(option3);
+        chart4.setOption(option4);
     </script>
 
 {% endblock %}

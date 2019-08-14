@@ -1,0 +1,113 @@
+{% extends "base.html" %}
+{% load staticfiles %}
+{% block title %}简历列表{% endblock %}
+
+{% block content %}
+
+    <table class="table table-hover" style="margin-left: 50px">
+            <thead>
+            <th>id</th>
+            <th>工作经验</th>
+            <th>性别</th>
+            <th>最高学历</th>
+            <th>查看详情</th>
+            </thead>
+            <tbody>
+            {% for book in books %}
+                <tr>
+                    <td>{{ book.cv_id }}</td>
+                    <td>{{ book.work_experience }}</td>
+                    <td>{{ book.gender }}</td>
+                    <td>{{ book.degree }}</td>
+                    <td><a>查看详情</a></td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td>暂无图书</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+    </table>
+
+    {# 实现分页标签的代码 #}
+    {# 这里使用 bootstrap 渲染页面 #}
+    <div id="pages" class="text-center" >
+        <nav>
+            <ul class="pagination">
+                <li class="step-links">
+                {% if books.has_previous %}
+                    <a class='active' href="?page={{ books.previous_page_number }}">上一页</a>
+                {% endif %}
+
+                <span class="current">
+                    Page {{ books.number }} of {{ books.paginator.num_pages }}</span>
+
+                {% if books.has_next %}
+                    <a class='active' href="?page={{ books.next_page_number }}">下一页</a>
+                {% endif %}
+                </li>
+            </ul>
+        </nav>
+    </div>
+
+{#    <div class="container col-md-8 col-md-offset-2">#}
+{##}
+{#        <table class="table table-hover">#}
+{#            <thead>#}
+{#            <th>id</th>#}
+{#            <th>姓名</th>#}
+{#            <th>工作经验</th>#}
+{#            <th>性别</th>#}
+{#            <th>最高学历</th>#}
+{#            <th>技能相似度</th>#}
+{#            <th>显示详情</th>#}
+{#            </thead>#}
+{#            <tbody>#}
+{#            {% for book in books %}#}
+{#                <tr>#}
+{#                    <td>{{ forloop.counter }}</td>#}
+{#                    <td>#}
+{#                        <a href="/book/detail?ISBN={{ book.ISBN }}">#}
+{#                            <img class="img-responsive"#}
+{#                                 src="/media/{{ book.cover }}"#}
+{#                                 width="90"#}
+{#                                 height="128"#}
+{#                                 alt="{{ book.title }}">#}
+{#                        </a>#}
+{#                    </td>#}
+{#                    <td><a href="/book/detail?ISBN={{ book.ISBN }}">{{ book.title }}</a></td>#}
+{#                    <td>{{ book.author }}#}
+{#                    <td>{{ book.category }}</td>#}
+{#                    <td>{{ book.location }}</td>#}
+{#                    <td>{{ book.quantity }}</td>#}
+{#                </tr>#}
+{#            {% empty %}#}
+{#                <tr>#}
+{#                    <td>暂无推荐选项</td>#}
+{#                </tr>#}
+{#            {% endfor %}#}
+{#            </tbody>#}
+{#        </table>#}
+{##}
+{#        <nav class="myContainer">#}
+{#            <ul class="pager">#}
+{#                {% if books.has_previous %}#}
+{#                    <li class="previous"><a#}
+{#                            href="{{ current_path }}&page={{ books.previous_page_number }}#hint">上一页</a>#}
+{#                    </li>#}
+{#                {% else %}#}
+{#                    <li class="previous disabled"><a href="#">上一页</a></li>#}
+{#                {% endif %}#}
+{#                第 {{ books.number }} / {{ books.paginator.num_pages }}页#}
+{#                {% if books.has_next %}#}
+{#                    <li class="next"><a#}
+{#                            href="{{ current_path }}&page={{ books.next_page_number }}#hint">下一页</a>#}
+{#                    </li>#}
+{#                {% else %}#}
+{#                    <li class="next disabled"><a href="#">下一页</a></li>#}
+{#                {% endif %}#}
+{#            </ul>#}
+{#        </nav>#}
+{#    </div>#}
+
+{% endblock %}

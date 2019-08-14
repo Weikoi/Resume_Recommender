@@ -14,12 +14,11 @@ import pandas as pd
 from keras.models import load_model
 from keras import backend
 
-
 pd.set_option('display.max_rows', 500)
 pd.set_option('display.max_columns', 500)
 pd.set_option('display.width', 1000)
 
-#Before prediction
+# Before prediction
 backend.clear_session()
 jieba.load_userdict(r"./corpus/jieba.txt")
 network = load_model('./dnn_model.h5')
@@ -154,7 +153,6 @@ def index(request):
 
 
 def analysis(request):
-
     import jieba.posseg as pseg
     import jieba
     import json
@@ -173,7 +171,59 @@ def analysis(request):
     jd_dict["job_duty"] = request.POST.get("job_duty")
     jd_dict["job_demand"] = request.POST.get("job_demand")
     jd_dict["skill_pair"] = transfer_pair(get_pair_by_jieba(request.POST.get("job_demand")))
-    response = render(request, 'analysis.html', {'jd_dict': jd_dict})
+
+    # 解析工作年数
+    def parse_exp(num):
+        num = int(num)
+        if not num or num == 0:
+            return 1
+        elif 0 < num < 3:
+            return 2
+        elif 3 <= num < 5:
+            return 3
+        elif 5 <= num < 7:
+            return 4
+        elif 7 <= num:
+            return 5
+
+    # 解析学历
+    def parse_edu(edu):
+        if re.search("不限", edu):
+            return 1
+        elif re.search("专科", edu):
+            return 2
+        elif re.search("本科", edu):
+            return 3
+        elif re.search("硕士", edu):
+            return 4
+        elif re.search("博士", edu):
+            return 5
+
+    # 解析技能要求
+    def parse_skill(skill_pair):
+        num = len(skill_pair)
+        if not num or num == 0:
+            return 1
+        elif 0 < num < 5:
+            return 2
+        elif 5 <= num < 10:
+            return 3
+        elif 10 <= num < 20:
+            return 4
+        elif 20 <= num:
+            return 5
+
+    rader_statics = [parse_exp(jd_dict["job_exp"]), parse_edu(jd_dict["edu_degree"]),
+                     parse_skill(jd_dict["skill_pair"])]
+    word_cloud = [{'name': k, 'value': v} for k, v in jd_dict["skill_pair"].items()]
+    # data_word = [{"name": "spring", "value": "2"}]
+    print(word_cloud)
+    context = {
+        'jd_dict': jd_dict,
+        'rader_statics': rader_statics,
+        'word_cloud': word_cloud,
+    }
+    response = render(request, 'analysis.html', context)
     jd_dict_json = json.dumps(jd_dict)
     response.set_cookie('jd_dict_json', jd_dict_json)
     return response
@@ -520,7 +570,7 @@ def result(request):
     id_list = result_df.sort_values("score", ascending=False)["cv_id"]
     print(id_list)
     result_df.set_index("cv_id")
-    raw_cv = pk.load(file=open("./data/cv_1000_raw_id.bin","rb"))
+    raw_cv = pk.load(file=open("./data/cv_1000_raw_id.bin", "rb"))
     # book_list = [raw_cv[i] for i in id_list]
     book_list = []
 
@@ -558,4 +608,84 @@ def result(request):
 
 def about(request):
     response = render(request, 'about.html')
+    return response
+
+
+def statistics(request):
+    import pickle as pk
+    from collections import Counter
+    data = pk.load(file=open("./data/sample_cv_1000_dict_id.bin", "rb"))
+
+    gender_stat = [0, 0]
+    degree_stat = [0, 0, 0, 0, 0]
+    exp_stat = [0, 0, 0, 0, 0]
+    exp_top = [0, 0]
+    count_list = []
+    for i in data:
+        if i["gender"] == 1:
+            gender_stat[0] += 1
+        else:
+            gender_stat[1] += 1
+        count_list.append(i["degree"])
+        if i["degree"] == 0:
+            degree_stat[0] += 1
+        elif i["degree"] == 1:
+            degree_stat[1] += 1
+        elif i["degree"] == 2:
+            degree_stat[2] += 1
+        elif i["degree"] == 3:
+            degree_stat[3] += 1
+        elif i["degree"] == 4:
+            degree_stat[4] += 1
+        if i["work_experience"] == 0:
+            exp_stat[0] += 1
+        elif 0 < i["work_experience"] < 3:
+            exp_stat[1] += 1
+        elif 3 <= i["work_experience"] < 5:
+            exp_stat[2] += 1
+        elif 5 <= i["work_experience"] < 10:
+            exp_stat[3] += 1
+        elif 10 <= i["work_experience"]:
+            exp_stat[4] += 1
+        if i["work_has_top_exp"] == 1:
+            exp_top[0] += 1
+        else:
+            exp_top[1] += 1
+    print(Counter(count_list))
+    context = {
+        "gender_stat": gender_stat,
+        "degree_stat": degree_stat,
+        "exp_stat": exp_stat,
+        "exp_top": exp_top,
+    }
+    print(context)
+    response = render(request, 'statistics.html', context)
+    return response
+
+
+def cv_list(request):
+    raw_cv = pk.load(file=open("./data/cv_1000_raw_id.bin", "rb"))
+
+    """
+    分页器模块
+    """
+    paginator = Paginator(raw_cv, 10)
+
+    if request.method == "GET":
+        # 获取 url 后面的 page 参数的值, 首页不显示 page 参数, 默认值是 1
+        page = request.GET.get('page')
+        try:
+            books = paginator.page(page)
+        # todo: 注意捕获异常
+        except PageNotAnInteger:
+            # 如果请求的页数不是整数, 返回第一页。
+            books = paginator.page(1)
+        except InvalidPage:
+            # 如果请求的页数不存在, 重定向页面
+            return HttpResponse('找不到页面的内容')
+        except EmptyPage:
+            # 如果请求的页数不在合法的页数范围内，返回结果的最后一页。
+            books = paginator.page(paginator.num_pages)
+
+    response = render(request, 'cv_list.html', {'books': books})
     return response
