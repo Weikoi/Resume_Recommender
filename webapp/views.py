@@ -591,19 +591,19 @@ def result(request):
         # 获取 url 后面的 page 参数的值, 首页不显示 page 参数, 默认值是 1
         page = request.GET.get('page')
         try:
-            books = paginator.page(page)
+            pager = paginator.page(page)
         # todo: 注意捕获异常
         except PageNotAnInteger:
             # 如果请求的页数不是整数, 返回第一页。
-            books = paginator.page(1)
+            pager = paginator.page(1)
         except InvalidPage:
             # 如果请求的页数不存在, 重定向页面
             return HttpResponse('找不到页面的内容')
         except EmptyPage:
             # 如果请求的页数不在合法的页数范围内，返回结果的最后一页。
-            books = paginator.page(paginator.num_pages)
+            pager = paginator.page(paginator.num_pages)
 
-    response = render(request, 'result.html', {'books': books})
+    response = render(request, 'result.html', {'cv_list': pager})
     return response
 
 
@@ -676,17 +676,62 @@ def cv_list(request):
         # 获取 url 后面的 page 参数的值, 首页不显示 page 参数, 默认值是 1
         page = request.GET.get('page')
         try:
-            books = paginator.page(page)
+            pager = paginator.page(page)
         # todo: 注意捕获异常
         except PageNotAnInteger:
             # 如果请求的页数不是整数, 返回第一页。
-            books = paginator.page(1)
+            pager = paginator.page(1)
         except InvalidPage:
             # 如果请求的页数不存在, 重定向页面
             return HttpResponse('找不到页面的内容')
         except EmptyPage:
             # 如果请求的页数不在合法的页数范围内，返回结果的最后一页。
-            books = paginator.page(paginator.num_pages)
+            pager = paginator.page(paginator.num_pages)
 
-    response = render(request, 'cv_list.html', {'books': books})
+    response = render(request, 'cv_list.html', {'pager': pager})
     return response
+
+
+def detail(request):
+    cv_id = request.GET.get('cv_id')
+    print("cv_id:", cv_id)
+    cv_raw = pk.load(open("./data/cv_1000_raw_id.bin", "rb"))
+    cv_id_set = set([])
+    for i in cv_raw:
+        cv_id_set.add(i["cv_id"])
+
+    if not cv_id or (int(cv_id) not in cv_id_set):
+        return HttpResponse('there is no such a resume')
+    try:
+        cv = cv_raw[int(cv_id)]
+        cv_id = cv["cv_id"]
+        exp = cv["work_experience"]
+        birthday = cv["birthday"]
+        gender = cv["gender"]
+        degree = cv["degree"]
+        education = cv["education"]
+        work = cv["work"]
+        project = cv["project"]
+        skill = cv["skill"]
+        train = cv["train"]
+        self_evaluation = cv["self_evaluation"]
+
+        context = {
+            "cv_id": cv_id,
+            "exp": exp,
+            "birthday": birthday,
+            "gender": gender,
+            "degree": degree,
+            "education": education,
+            "work": work,
+            "project": project,
+            "skill": skill,
+            "train": train,
+            "self_evaluation": self_evaluation,
+        }
+
+        response = render(request, 'detail.html', context)
+        return response
+
+    except Exception as e:
+        return HttpResponse('there is no a erro @ Exception ' + str(e))

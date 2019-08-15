@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+{% load staticfiles %}
+{% block title %}查看简历详情{% endblock %}
+
+
+
+{% block content %}
+
+    <div class="container myContainer">
+        <div class="row">
+            <div class="col-md-10 col-md-offset-1">
+                <div class="col-md-6 col-md-offset-1">
+                    <br>
+                    <h4>cv_id：{{ cv_id }}</h4>
+                    <h4>工作经验：{{ exp }}</h4>
+                    <h4>生日:{{ birthday }}</h4>
+                    <h4>性别：{{ gender }}</h4>
+                    <h4>最高学历：{{ degree }}</h4>
+                    <hr>
+                    <h4>学习经历：</h4>
+                    <div>
+                        <br>
+                        {% for i in education %}
+                            <div>学历：{{ i.degree }}</div>
+                            <div>时间：{{ i.start }}-{{ i.end }}</div>
+                            <div>学校：{{ i.school }}  主修：{{ i.major }}</div>
+                            <br>
+                        {% endfor %}
+                    </div>
+                    <hr>
+                    <h4>工作经历:</h4>
+                    <div>
+                        <br>
+                        {% for i in work %}
+                            <div>公司：{{ i.company }}  部门：{{ i.department }}</div>
+                            <div>时间：{{ i.start }}-{{ i.end }}</div>
+                            <div>从事：{{ i.statement }}}}</div>
+                            <div>具体工作：{{ i.description }}}}</div>
+                            <br>
+                        {% endfor %}
+                    </div>
+                    <hr>
+                    <h4>项目经历:</h4>
+                    <div>
+                        <br>
+                        {% for i in work %}
+                            <div>项目名称：{{ i.name }}  公司：{{ i.company }}</div>
+                            <div>时间：{{ i.start }}-{{ i.end }}</div>
+                            <div>职责：{{ i.duty }}}}</div>
+                            <div>具体工作：{{ i.description }}}}</div>
+                            <br>
+                        {% endfor %}
+                    </div>
+                    <hr>
+                    <h4>掌握技能:</h4>
+                    <div>
+                        <br>
+                        {% for i in skill %}
+                            <div>技能名称：{{ i.name }}  掌握程度：{{ i.level }}</div>
+                            <br>
+                        {% endfor %}
+                    </div>
+                    <hr>
+                    <h4>培训经历:</h4>
+                    <div>
+                        <br>
+                        {% for i in train %}
+                            <div>培训内容：{{ i.name }}  培训方：{{ i.organ }}</div>
+                            <div>时间：{{ i.start }}-{{ i.end }}</div>
+                            <div>具体内容：{{ i.description }}}}</div>
+                            <br>
+                        {% endfor %}
+                    </div>
+                    <hr>
+
+                    <h4>自我评价:</h4>
+                    <div>
+                        <p>
+                            {{ self_evaluation }}
+                        </p>
+                    </div>
+                    <hr>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}

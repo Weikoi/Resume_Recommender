@@ -10,8 +10,9 @@ import webapp.views as views
 urlpatterns = [
                   url(r'^$', views.index, name='index'),
                   url(r'analysis/', views.analysis, name='analysis'),
-                  url(r'result/', views.result, name='result'),
+                  url(r'^result/', views.result, name='result'),
                   url(r'about/', views.about, name='about'),
                   url(r'statistics/', views.statistics, name='statistics'),
                   url(r'cv_list/', views.cv_list, name='cv_list'),
+                  url(r'detail', views.detail, name='detail'),
 ]

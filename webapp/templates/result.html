@@ -15,15 +15,15 @@
             <th>查看详情</th>
             </thead>
             <tbody>
-            {% for book in books %}
+            {% for cv in cv_list %}
                 <tr>
-                    <td>{{ book.cv_id }}</td>
-                    <td>{{ book.work_experience }}</td>
-                    <td>{{ book.gender }}</td>
-                    <td>{{ book.degree }}</td>
-                    <td>{{ book.skill_sim }}</td>
-                    <td>{{ book.score }}</td>
-                    <td><a>查看详情</a></td>
+                    <td>{{ cv.cv_id }}</td>
+                    <td>{{ cv.work_experience }}</td>
+                    <td>{{ cv.gender }}</td>
+                    <td>{{ cv.degree }}</td>
+                    <td>{{ cv.skill_sim }}</td>
+                    <td>{{ cv.score }}</td>
+                    <td><a href="/detail?cv_id={{ cv.cv_id }}">查看详情</a></td>
                 </tr>
             {% empty %}
                 <tr>
@@ -39,15 +39,15 @@
         <nav>
             <ul class="pagination">
                 <li class="step-links">
-                {% if books.has_previous %}
-                    <a class='active' href="?page={{ books.previous_page_number }}">上一页</a>
+                {% if cv_list.has_previous %}
+                    <a class='active' href="?page={{ cv_list.previous_page_number }}">上一页</a>
                 {% endif %}
 
                 <span class="current">
-                    Page {{ books.number }} of {{ books.paginator.num_pages }}</span>
+                    Page {{ cv_list.number }} of {{ cv_list.paginator.num_pages }}</span>
 
-                {% if books.has_next %}
-                    <a class='active' href="?page={{ books.next_page_number }}">下一页</a>
+                {% if cv_list.has_next %}
+                    <a class='active' href="?page={{ cv_list.next_page_number }}">下一页</a>
                 {% endif %}
                 </li>
             </ul>
