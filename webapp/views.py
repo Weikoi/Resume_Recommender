@@ -512,7 +512,7 @@ def result(request):
     import math
     from util.tools import pretty_dict
     new_sample_list = []
-    for idx,i in enumerate(sample_list):
+    for idx, i in enumerate(sample_list):
         # print(pretty_dict(i))
         """
         正样本特征构造
@@ -527,7 +527,7 @@ def result(request):
         if gap_exp < 0:
             i["gap_exp"] = gap_exp
         elif gap_exp > 3:
-            i["gap_exp"] = - gap_exp/2
+            i["gap_exp"] = - gap_exp / 2
         else:
             i["gap_exp"] = 0
 
@@ -539,11 +539,11 @@ def result(request):
         if gap_edu < 0:
             i["gap_edu"] = gap_exp
         elif gap_edu > 1:
-            i["gap_edu"] = - gap_exp/2
+            i["gap_edu"] = - gap_exp / 2
         else:
             i["gap_edu"] = 0
 
-        i["score"] = i["score_edu"] + i["score_work"] + i["skill_sim_filter"] + i["gap_edu"] - i["edu_dz_is"] + 10
+        i["score"] = (i["score_edu"] + i["score_work"] + i["skill_sim_filter"] + i["gap_edu"] - i["edu_dz_is"] + 8)/10
         # print(pretty_dict(i))
 
         """
