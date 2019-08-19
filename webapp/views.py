@@ -488,9 +488,9 @@ def result(request):
     all_columns = selected_jd_features + selected_cv_features + label_features
     columns = selected_jd_features + selected_cv_features + sim_features
 
-    """
-    此循环是实时计算使用的
-    """
+    # """
+    # 此循环是实时计算使用的
+    # """
     # for i in range(cv_length):
     #     sample_data = {}
     #     print("%d====of===10000" % i)
@@ -498,12 +498,12 @@ def result(request):
     #
     #     for key in selected_jd_features:
     #         sample_data[key] = new_dict[key]
-    #     for key in selected_cv_features:
+    #     for key in cv_features:
     #         sample_data[key] = cv[key]
     #     sample_data["skill_sim"] = cal_similarity(new_dict, cv)
     #     sample_data["sample_id"] = i
     #     sample_list.append(sample_data)
-    # pk.dump(sample_list, file=open("./data/sample_10000.bin", "wb"))
+    # pk.dump(sample_list, file=open("./data/sample_1000.bin", "wb"))
     sample_list = pk.load(file=open("./data/sample_1000.bin", "rb"))
 
     """
@@ -543,7 +543,7 @@ def result(request):
         else:
             i["gap_edu"] = 0
 
-        i["score"] = i["score_edu"] + i["score_work"] + i["skill_sim_filter"] + i["gap_edu"] - i["edu_dz_is"]
+        i["score"] = i["score_edu"] + i["score_work"] + i["skill_sim_filter"] + i["gap_edu"] - i["edu_dz_is"] + 10
         # print(pretty_dict(i))
 
         """
@@ -576,6 +576,7 @@ def result(request):
     df["class"] = df["predict"].apply(lambda x: 1 if x > 0.8 else 0)
 
     result_df = df[df["class"] == 1]
+    result_df = result_df[result_df["work_experience"] != 0]
     # print(len(result_df.columns))
     id_list = result_df.sort_values("score", ascending=False)["cv_id"]
     # print(id_list)
