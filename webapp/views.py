@@ -512,7 +512,7 @@ def result(request):
     import math
     from util.tools import pretty_dict
     new_sample_list = []
-    for i in sample_list:
+    for idx,i in enumerate(sample_list):
         # print(pretty_dict(i))
         """
         正样本特征构造
@@ -525,16 +525,25 @@ def result(request):
 
         gap_exp = i["work_experience"] - i["job_exp"]
         if gap_exp < 0:
-            i["gap_exp"] = - math.log(-gap_exp)
-        if gap_exp > 3:
-            i["gap_exp"] = - math.log(gap_exp)
+            i["gap_exp"] = gap_exp
+        elif gap_exp > 3:
+            i["gap_exp"] = - gap_exp/2
         else:
             i["gap_exp"] = 0
+
         i["score_work"] = i["work_has_top_exp"] + i["gap_exp"]
-        i["skill_sim_filter"] = i["skill_sim"] if i["skill_sim"] > 0.3 else -1
+        i["skill_sim_filter"] = i["skill_sim"] if i["skill_sim"] > 0.5 else -1
         # i["score_edu_filter"] = i["score_edu"] if i["score_edu"] >= 0.1 else -1
-        i["gap_edu"] = i["degree"] + 1 - i["edu_degree"]
-        i["score"] = i["score_edu"] * 2 + i["score_work"] + i["skill_sim_filter"] + i["gap_edu"]
+        gap_edu = i["degree"] + 1 - i["edu_degree"]
+
+        if gap_edu < 0:
+            i["gap_edu"] = gap_exp
+        elif gap_edu > 1:
+            i["gap_edu"] = - gap_exp/2
+        else:
+            i["gap_edu"] = 0
+
+        i["score"] = i["score_edu"] + i["score_work"] + i["skill_sim_filter"] + i["gap_edu"] - i["edu_dz_is"]
         # print(pretty_dict(i))
 
         """
@@ -555,21 +564,21 @@ def result(request):
     预测向量构造
     """
     df = pd.DataFrame(new_sample_list)
-    print(len(columns))
+
     X = df[columns]
     # print(X.describe())
     X = X.values.reshape((1000, 53 * 1))
 
     df["predict"] = network.predict(X)
-
-    print(df["predict"])
-
-    df["class"] = df["predict"].apply(lambda x: 1 if x > 0.90 else 0)
+    print("===============================================")
+    print((df.loc[df['cv_id'] == 613]["work_experience"]))
+    # pk.dump(df, file=open("./df.pkl", "wb"))
+    df["class"] = df["predict"].apply(lambda x: 1 if x > 0.8 else 0)
 
     result_df = df[df["class"] == 1]
     # print(len(result_df.columns))
     id_list = result_df.sort_values("score", ascending=False)["cv_id"]
-    print(id_list)
+    # print(id_list)
     result_df.set_index("cv_id")
     raw_cv = pk.load(file=open("./data/cv_1000_raw_id.bin", "rb"))
     # book_list = [raw_cv[i] for i in id_list]
@@ -580,6 +589,7 @@ def result(request):
 
         temp_dict["skill_sim"] = float(df.loc[df['cv_id'] == i]["skill_sim"])
         temp_dict["score"] = float(df.loc[df['cv_id'] == i]["score"])
+
         book_list.append(temp_dict)
 
     """
